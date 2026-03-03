@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: aether-web-agent
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: HEADLESS
+        value: "true"
+      - key: OLLAMA_URL
+        placeholder: "Enter your AI provider URL (e.g., https://api.siliconflow.cn/v1)"
+      - key: OLLAMA_MODEL
+        placeholder: "Enter model name (e.g., deepseek-ai/DeepSeek-V3)"
+      - key: OLLAMA_API_KEY
+        placeholder: "Enter your API Key"

@@ -57,7 +57,7 @@ const App: React.FC = () => {
     setScreenshot(null);
 
     try {
-      const response = await fetch('http://localhost:3001/api/run', {
+      const response = await fetch('/api/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goal }),

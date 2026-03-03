@@ -72,7 +72,7 @@ app.post('/api/run', async (req, res) => {
 });
 
 // Catch-all route to serve the frontend's index.html
-app.get('*', (_req, res) => {
+app.get('/:path*', (_req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 

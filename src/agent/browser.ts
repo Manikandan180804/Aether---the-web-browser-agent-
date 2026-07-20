@@ -71,12 +71,20 @@ export class BrowserManager {
             await this.page.waitForLoadState('domcontentloaded', { timeout: 1000 });
         } catch (e) { }
 
-        const screenshotBuffer = await this.page.screenshot({
-            type: 'jpeg',
-            quality: 50,
-            scale: 'css'
-        });
-        const screenshot = screenshotBuffer.toString('base64');
+        let screenshot: string | undefined;
+        try {
+            const screenshotBuffer = await this.page.screenshot({
+                type: 'jpeg',
+                quality: 40,
+                scale: 'css',
+                animations: 'disabled',
+                timeout: 4000
+            });
+            screenshot = screenshotBuffer.toString('base64');
+        } catch (screenshotError: any) {
+            console.warn(`[Screenshot Warning] ${screenshotError.message}`);
+        }
+
         const url = this.page.url();
         const title = await this.page.title();
 

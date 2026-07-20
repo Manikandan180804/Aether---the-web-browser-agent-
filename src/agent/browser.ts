@@ -151,9 +151,20 @@ export class BrowserManager {
 
         if (await element.isVisible()) {
             await element.scrollIntoViewIfNeeded();
-            await element.fill(''); // Clear first
-            await element.type(text, { delay: 50 });
-            await element.press('Enter');
+            try {
+                await element.fill(text, { timeout: 5000 });
+                await element.press('Enter', { timeout: 3000 });
+            } catch (e) {
+                console.warn(`Direct fill/press failed for ${id}, using fallback input evaluation`);
+                await element.evaluate((el: any, val: string) => {
+                    el.value = val;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                    el.dispatchEvent(new Event('change', { bubbles: true }));
+                    if (el.form) {
+                        el.form.requestSubmit ? el.form.requestSubmit() : el.form.submit();
+                    }
+                }, text);
+            }
         } else {
             throw new Error(`Element ${id} is not visible and cannot be typed into.`);
         }

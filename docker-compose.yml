@@ -1,0 +1,14 @@
+services:
+  aether-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aether_web_agent
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env
+    environment:
+      - PORT=3001
+      - HEADLESS=true
+    restart: unless-stopped

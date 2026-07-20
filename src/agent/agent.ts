@@ -33,7 +33,10 @@ export class AetherAgent {
                     console.log(`[Step ${step}] 🚀 Kickstarting mission from about:blank...`);
                     // Using Bing instead of Google to avoid SecurityCompromiseError / Bot Detection
                     let startUrl = 'https://www.bing.com';
-                    if (goal.toLowerCase().includes('youtube')) startUrl = 'https://www.youtube.com';
+                    if (goal.toLowerCase().includes('youtube')) {
+                        const cleanQuery = goal.replace(/play|search|for|on|in|video|youtube/gi, '').trim() || goal;
+                        startUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanQuery)}`;
+                    }
 
                     await this.browser.navigate(startUrl);
                     if (onStep) {

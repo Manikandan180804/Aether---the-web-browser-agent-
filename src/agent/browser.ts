@@ -24,12 +24,32 @@ export class BrowserManager {
 
     async initialize() {
         const isHeadless = process.env.HEADLESS !== 'false';
-        this.browser = await chromium.launch({ headless: isHeadless }); // Headless in production, windowed in dev if HEADLESS=false
+        this.browser = await chromium.launch({
+            headless: isHeadless,
+            args: [
+                '--disable-blink-features=AutomationControlled',
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-infobars',
+                '--window-position=0,0',
+                '--ignore-certificate-errors',
+                '--ignore-certificate-errors-spki-list'
+            ]
+        });
         this.context = await this.browser.newContext({
             viewport: { width: 1280, height: 720 },
-            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            locale: 'en-US',
+            extraHTTPHeaders: {
+                'Accept-Language': 'en-US,en;q=0.9',
+            }
         });
         this.page = await this.context.newPage();
+
+        // Evasion script to bypass navigator.webdriver bot detection
+        await this.page.addInitScript(() => {
+            Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        });
 
         this.page.setDefaultTimeout(20000);
         this.page.setDefaultNavigationTimeout(20000);

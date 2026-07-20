@@ -48,13 +48,20 @@ export class AetherAgent {
                 }
 
                 const userPrompt = this.constructPrompt(goal, state, step);
-                const responseText = await this.callAI(userPrompt);
+                let responseText = '';
+                try {
+                    responseText = await this.callAI(userPrompt);
+                } catch (aiError: any) {
+                    console.error(`[Step ${step}] ❌ ${aiError.message}`);
+                    if (onStep) onStep({ type: 'error', message: aiError.message });
+                    await new Promise(r => setTimeout(r, 3000));
+                    continue;
+                }
 
                 if (!responseText) {
-                    const errMsg = "Empty response from AI - check API key/balance.";
+                    const errMsg = "Empty response received from AI model - please check model availability or API key.";
                     console.error(`[Step ${step}] ❌ ${errMsg}`);
                     if (onStep) onStep({ type: 'error', message: errMsg });
-                    // Wait 3 seconds on error to prevent infinite fast loop
                     await new Promise(r => setTimeout(r, 3000));
                     continue;
                 }
@@ -152,8 +159,8 @@ export class AetherAgent {
 
             if (!response.ok) {
                 const errText = await response.text();
-                console.error(`🚨 SiliconFlow/AI API Error: ${response.status} - ${errText}`);
-                return "";
+                console.error(`🚨 AI API Error: ${response.status} - ${errText}`);
+                throw new Error(`AI API Error (${response.status}): ${errText || response.statusText}`);
             }
 
             const data = await response.json();
@@ -166,10 +173,10 @@ export class AetherAgent {
             }
 
             console.error("🔍 Unknown AI response format:", JSON.stringify(data));
-            return "";
+            throw new Error(`Unknown AI response format received from ${endpoint}`);
         } catch (err: any) {
-            console.error("🔥 🔥 Unexpected Fetch error in callAI:", err.message);
-            return "";
+            console.error("🔥 Unexpected Fetch error in callAI:", err.message);
+            throw err;
         }
     }
 

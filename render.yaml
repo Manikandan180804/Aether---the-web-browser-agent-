@@ -9,9 +9,9 @@ services:
       - key: HEADLESS
         value: "true"
       - key: OLLAMA_URL
-        value: "https://api.siliconflow.cn/v1"
+        value: "https://ollama.com"
       - key: OLLAMA_MODEL
-        value: "deepseek-ai/DeepSeek-V3"
+        value: "gpt-oss:120b-cloud"
       - key: OLLAMA_API_KEY
         sync: false
 
